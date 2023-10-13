@@ -4,15 +4,14 @@
 #define NUM_WEEKS 4
 #define NUM_SETS 3
 
-
 void calculateWeights(int week, int oneRepMax, float trainingPercentages[], const char *liftName) {
     printf("%s Training Week %d (5/3/1 Wendler):\n", liftName, week);
 
     int repSetGoals[NUM_WEEKS][NUM_SETS] = {
-        {3, 5, 5},
+        {5, 5, 5},
         {3, 3, 3},
-        {3, 5, 1},
-        {3, 5, 5}  
+        {5, 3, 1},
+        {5, 5, 5}  
     };
 
     printf("Rep-Set Goals: %d x %d, %d x %d, %d x %d\n",
@@ -23,6 +22,10 @@ void calculateWeights(int week, int oneRepMax, float trainingPercentages[], cons
         trainingPercentages[0] = 0.65;
         trainingPercentages[1] = 0.75;
         trainingPercentages[2] = 0.85;
+    } else if (week == 4) {
+        trainingPercentages[0] = 0.4;
+        trainingPercentages[1] = 0.5;
+        trainingPercentages[2] = 0.6;
     } else {
         trainingPercentages[0] = 0.75 + (week - 2) * 0.05;
         trainingPercentages[1] = 0.85 + (week - 2) * 0.05;
@@ -41,6 +44,7 @@ int main(int argc, char *argv[]) {
     int benchMax = 250;
     int ohpMax = 150;
     int deadliftMax = 400;
+    int weekToDisplay = 0;
 
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
@@ -58,6 +62,9 @@ int main(int argc, char *argv[]) {
                 case 'd':
                     deadliftMax = atoi(argv[i + 1]);
                     break;
+                case 'w':
+                    weekToDisplay = atoi(argv[i + 1]);
+                    break;
                 default:
                     fprintf(stderr, "Unknown option: -%c\n", option);
                     return 1;
@@ -66,12 +73,15 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc > 1) {
-        for (int week = 1; week <= NUM_WEEKS; week++) {
+        if (weekToDisplay >= 1 && weekToDisplay <= NUM_WEEKS) {
             float trainingPercentages[NUM_SETS];
-            calculateWeights(week, squatMax, trainingPercentages, "Squat");
-            calculateWeights(week, benchMax, trainingPercentages, "Bench Press");
-            calculateWeights(week, ohpMax, trainingPercentages, "Overhead Press");
-            calculateWeights(week, deadliftMax, trainingPercentages, "Deadlift");
+            calculateWeights(weekToDisplay, squatMax, trainingPercentages, "Squat");
+            calculateWeights(weekToDisplay, benchMax, trainingPercentages, "Bench Press");
+            calculateWeights(weekToDisplay, ohpMax, trainingPercentages, "Overhead Press");
+            calculateWeights(weekToDisplay, deadliftMax, trainingPercentages, "Deadlift");
+        } else {
+            fprintf(stderr, "Invalid week number. Please select a week from 1 to %d.\n", NUM_WEEKS);
+            return 1;
         }
     }
 
