@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-// Constants for the number of weeks and sets
 #define NUM_WEEKS 4
 #define NUM_SETS 3
 
-// Function to calculate training weights for a lift based on 1RM, week, and lift name
+
 void calculateWeights(int week, int oneRepMax, float trainingPercentages[], const char *liftName) {
     printf("%s Training Week %d (5/3/1 Wendler):\n", liftName, week);
     if (week == 1) {
@@ -24,18 +24,43 @@ void calculateWeights(int week, int oneRepMax, float trainingPercentages[], cons
     printf("\n");
 }
 
-int main() {
-    int squatMax = 300; // Replace with your actual squat 1RM
-    int benchMax = 250; // Replace with your actual bench press 1RM
-    int ohpMax = 150;   // Replace with your actual overhead press 1RM
-    int deadliftMax = 400; // Replace with your actual deadlift 1RM
+int main(int argc, char *argv[]) {
+    int squatMax = 300; 
+    int benchMax = 250;
+    int ohpMax = 150;
+    int deadliftMax = 400;
 
-    for (int week = 1; week <= NUM_WEEKS; week++) {
-        float trainingPercentages[NUM_SETS];
-        calculateWeights(week, squatMax, trainingPercentages, "Squat");
-        calculateWeights(week, benchMax, trainingPercentages, "Bench Press");
-        calculateWeights(week, ohpMax, trainingPercentages, "Overhead Press");
-        calculateWeights(week, deadliftMax, trainingPercentages, "Deadlift");
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            char option = argv[i][1];
+            switch (option) {
+                case 's':
+                    squatMax = atoi(argv[i + 1]);
+                    break;
+                case 'b':
+                    benchMax = atoi(argv[i + 1]);
+                    break;
+                case 'o':
+                    ohpMax = atoi(argv[i + 1]);
+                    break;
+                case 'd':
+                    deadliftMax = atoi(argv[i + 1]);
+                    break;
+                default:
+                    fprintf(stderr, "Unknown option: -%c\n", option);
+                    return 1;
+            }
+        }
+    }
+
+    if (argc > 1) { 
+        for (int week = 1; week <= NUM_WEEKS; week++) {
+            float trainingPercentages[NUM_SETS];
+            calculateWeights(week, squatMax, trainingPercentages, "Squat");
+            calculateWeights(week, benchMax, trainingPercentages, "Bench Press");
+            calculateWeights(week, ohpMax, trainingPercentages, "Overhead Press");
+            calculateWeights(week, deadliftMax, trainingPercentages, "Deadlift");
+        }
     }
 
     return 0;
