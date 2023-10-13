@@ -7,6 +7,18 @@
 
 void calculateWeights(int week, int oneRepMax, float trainingPercentages[], const char *liftName) {
     printf("%s Training Week %d (5/3/1 Wendler):\n", liftName, week);
+
+    int repSetGoals[NUM_WEEKS][NUM_SETS] = {
+        {3, 5, 5},
+        {3, 3, 3},
+        {3, 5, 1},
+        {3, 5, 5}  
+    };
+
+    printf("Rep-Set Goals: %d x %d, %d x %d, %d x %d\n",
+           repSetGoals[week - 1][0], repSetGoals[week - 1][1], repSetGoals[week - 1][2],
+           repSetGoals[week - 1][0], repSetGoals[week - 1][1], repSetGoals[week - 1][2]);
+
     if (week == 1) {
         trainingPercentages[0] = 0.65;
         trainingPercentages[1] = 0.75;
@@ -25,7 +37,7 @@ void calculateWeights(int week, int oneRepMax, float trainingPercentages[], cons
 }
 
 int main(int argc, char *argv[]) {
-    int squatMax = 300; 
+    int squatMax = 300;
     int benchMax = 250;
     int ohpMax = 150;
     int deadliftMax = 400;
@@ -53,7 +65,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (argc > 1) { 
+    if (argc > 1) {
         for (int week = 1; week <= NUM_WEEKS; week++) {
             float trainingPercentages[NUM_SETS];
             calculateWeights(week, squatMax, trainingPercentages, "Squat");
