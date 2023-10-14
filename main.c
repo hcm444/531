@@ -3,8 +3,9 @@
 
 #define NUM_WEEKS 4
 #define NUM_SETS 3
+#define POUNDS_TO_KILOGRAMS 0.453592
 
-void calculateWeights(int week, int oneRepMax, const char *liftName) {
+void calculateWeights(int week, int oneRepMax, const char *liftName, int useKilograms) {
     if (week < 1 || week > NUM_WEEKS) {
         fprintf(stderr, "Invalid week number. Please select a week from 1 to %d.\n", NUM_WEEKS);
         return;
@@ -62,13 +63,21 @@ void calculateWeights(int week, int oneRepMax, const char *liftName) {
     }
 
     for (int set = 0; set < NUM_SETS; set++) {
-        int weight = oneRepMax * trainingPercentages[set];
-        printf("Set %d: %d lbs x %d", set + 1, weight, reps[set]);
+        float weight = oneRepMax * trainingPercentages[set];
+
+        if (useKilograms) {
+            weight *= POUNDS_TO_KILOGRAMS; // Convert to kilograms
+        }
+
+        printf("Set %d: %.1f %s x %d", set + 1, weight, useKilograms ? "kg" : "lbs", reps[set]);
+
         if (week != 4 && set == 2) {
             printf("+");
         }
+
         printf("\n");
     }
+
     printf("\n");
 }
 
@@ -78,6 +87,7 @@ int main(int argc, char *argv[]) {
     int ohpMax = 0;
     int deadliftMax = 0;
     int weekToDisplay = 0;
+    int useKilograms = 0; // Default to displaying weights in pounds
 
     if (argc < 2) {
         fprintf(stderr, "At least one lift (squat, bench, ohp, deadlift) must be specified.\n");
@@ -124,10 +134,15 @@ int main(int argc, char *argv[]) {
                             return 1;
                         }
                         break;
+                    case 'k':
+                        useKilograms = 1; // Enable kilograms display
+                        break;
                     default:
                         fprintf(stderr, "Unknown option: -%c\n", option);
                         return 1;
                 }
+            } else if (option == 'k') {
+                useKilograms = 1; // Enable kilograms display
             }
         }
     }
@@ -135,18 +150,18 @@ int main(int argc, char *argv[]) {
     if (squatMax > 0 || benchMax > 0 || ohpMax > 0 || deadliftMax > 0) {
         if (weekToDisplay == 0) {
             for (int week = 1; week <= NUM_WEEKS; week++) {
-                if (squatMax > 0) calculateWeights(week, squatMax, "Squat");
-                if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press");
-                if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press");
-                if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift");
+                if (squatMax > 0) calculateWeights(week, squatMax, "Squat", useKilograms);
+                if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press", useKilograms);
+                if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press", useKilograms);
+                if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift", useKilograms);
             }
         } else {
             for (int week = 1; week <= NUM_WEEKS; week++) {
                 if (week == weekToDisplay) {
-                    if (squatMax > 0) calculateWeights(week, squatMax, "Squat");
-                    if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press");
-                    if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press");
-                    if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift");
+                    if (squatMax > 0) calculateWeights(week, squatMax, "Squat", useKilograms);
+                    if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press", useKilograms);
+                    if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press", useKilograms);
+                    if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift", useKilograms);
                 }
             }
         }
