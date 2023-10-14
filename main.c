@@ -5,6 +5,11 @@
 #define NUM_SETS 3
 
 void calculateWeights(int week, int oneRepMax, float trainingPercentages[], const char *liftName) {
+    if (week < 1 || week > NUM_WEEKS) {
+        fprintf(stderr, "Invalid week number. Please select a week from 1 to %d.\n", NUM_WEEKS);
+        return;
+    }
+
     printf("%s Training Week %d (5/3/1 Wendler):\n", liftName, week);
 
     int repSetGoals[NUM_WEEKS][NUM_SETS] = {
@@ -46,6 +51,11 @@ int main(int argc, char *argv[]) {
     int deadliftMax = 0;
     int weekToDisplay = 0;
 
+    if (argc < 2) {
+        fprintf(stderr, "At least one lift (squat, bench, ohp, deadlift) must be specified.\n");
+        return 1;
+    }
+
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             char option = argv[i][1];
@@ -53,15 +63,31 @@ int main(int argc, char *argv[]) {
                 switch (option) {
                     case 's':
                         squatMax = atoi(argv[i + 1]);
+                        if (squatMax <= 0) {
+                            fprintf(stderr, "Invalid squat max. Please specify a positive value.\n");
+                            return 1;
+                        }
                         break;
                     case 'b':
                         benchMax = atoi(argv[i + 1]);
+                        if (benchMax <= 0) {
+                            fprintf(stderr, "Invalid bench press max. Please specify a positive value.\n");
+                            return 1;
+                        }
                         break;
                     case 'o':
                         ohpMax = atoi(argv[i + 1]);
+                        if (ohpMax <= 0) {
+                            fprintf(stderr, "Invalid overhead press max. Please specify a positive value.\n");
+                            return 1;
+                        }
                         break;
                     case 'd':
                         deadliftMax = atoi(argv[i + 1]);
+                        if (deadliftMax <= 0) {
+                            fprintf(stderr, "Invalid deadlift max. Please specify a positive value.\n");
+                            return 1;
+                        }
                         break;
                     case 'w':
                         weekToDisplay = atoi(argv[i + 1]);
@@ -80,7 +106,7 @@ int main(int argc, char *argv[]) {
 
     // Calculate routines only if at least one lift is specified.
     if (squatMax > 0 || benchMax > 0 || ohpMax > 0 || deadliftMax > 0) {
-        if (argc > 1 && weekToDisplay == 0) {
+        if (weekToDisplay == 0) {
             for (int week = 1; week <= NUM_WEEKS; week++) {
                 float trainingPercentages[NUM_SETS];
                 if (squatMax > 0) calculateWeights(week, squatMax, trainingPercentages, "Squat");
@@ -88,16 +114,13 @@ int main(int argc, char *argv[]) {
                 if (ohpMax > 0) calculateWeights(week, ohpMax, trainingPercentages, "Overhead Press");
                 if (deadliftMax > 0) calculateWeights(week, deadliftMax, trainingPercentages, "Deadlift");
             }
-        } else if (weekToDisplay > 0) {
+        } else {
             float trainingPercentages[NUM_SETS];
             if (squatMax > 0) calculateWeights(weekToDisplay, squatMax, trainingPercentages, "Squat");
             if (benchMax > 0) calculateWeights(weekToDisplay, benchMax, trainingPercentages, "Bench Press");
             if (ohpMax > 0) calculateWeights(weekToDisplay, ohpMax, trainingPercentages, "Overhead Press");
             if (deadliftMax > 0) calculateWeights(weekToDisplay, deadliftMax, trainingPercentages, "Deadlift");
         }
-    } else {
-        fprintf(stderr, "At least one lift (squat, bench, ohp, deadlift) must be specified.\n");
-        return 1;
     }
 
     return 0;
