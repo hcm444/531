@@ -4,7 +4,7 @@
 #define NUM_WEEKS 4
 #define NUM_SETS 3
 
-void calculateWeights(int week, int oneRepMax, float trainingPercentages[], const char *liftName) {
+void calculateWeights(int week, int oneRepMax, const char *liftName) {
     if (week < 1 || week > NUM_WEEKS) {
         fprintf(stderr, "Invalid week number. Please select a week from 1 to %d.\n", NUM_WEEKS);
         return;
@@ -19,27 +19,55 @@ void calculateWeights(int week, int oneRepMax, float trainingPercentages[], cons
         {5, 5, 5}
     };
 
-    printf("Rep-Set Goals: %d x %d, %d x %d, %d x %d\n",
-           repSetGoals[week - 1][0], repSetGoals[week - 1][1], repSetGoals[week - 1][2],
-           repSetGoals[week - 1][0], repSetGoals[week - 1][1], repSetGoals[week - 1][2]);
+    int reps[NUM_SETS];
+    if (week == 1) {
+        reps[0] = 5;
+        reps[1] = 5;
+        reps[2] = 5;
+    } else if (week == 2) {
+        reps[0] = 3;
+        reps[1] = 3;
+        reps[2] = 3;
+    } else if (week == 4) {
+        reps[0] = 5;
+        reps[1] = 5;
+        reps[2] = 5;
+    } else {
+        reps[0] = 5;
+        reps[1] = 3;
+        reps[2] = 1;
+    }
 
+    float trainingPercentages[NUM_SETS];
     if (week == 1) {
         trainingPercentages[0] = 0.65;
         trainingPercentages[1] = 0.75;
         trainingPercentages[2] = 0.85;
+    } else if (week == 2) {
+        trainingPercentages[0] = 0.70;
+        trainingPercentages[1] = 0.80;
+        trainingPercentages[2] = 0.90;
+    } else if (week == 3) {
+        trainingPercentages[0] = 0.75;
+        trainingPercentages[1] = 0.85;
+        trainingPercentages[2] = 0.95;
     } else if (week == 4) {
         trainingPercentages[0] = 0.4;
         trainingPercentages[1] = 0.5;
         trainingPercentages[2] = 0.6;
     } else {
-        trainingPercentages[0] = 0.75 + (week - 2) * 0.05;
-        trainingPercentages[1] = 0.85 + (week - 2) * 0.05;
-        trainingPercentages[2] = 0.95 + (week - 2) * 0.05;
+        trainingPercentages[0] = 0.75;
+        trainingPercentages[1] = 0.85;
+        trainingPercentages[2] = 0.95;
     }
 
     for (int set = 0; set < NUM_SETS; set++) {
         int weight = oneRepMax * trainingPercentages[set];
-        printf("Set %d: %d lbs\n", set + 1, weight);
+        printf("Set %d: %d lbs x %d", set + 1, weight, reps[set]);
+        if (week != 4 && set == 2) {
+            printf("+");
+        }
+        printf("\n");
     }
     printf("\n");
 }
@@ -104,22 +132,23 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Calculate routines only if at least one lift is specified.
     if (squatMax > 0 || benchMax > 0 || ohpMax > 0 || deadliftMax > 0) {
         if (weekToDisplay == 0) {
             for (int week = 1; week <= NUM_WEEKS; week++) {
-                float trainingPercentages[NUM_SETS];
-                if (squatMax > 0) calculateWeights(week, squatMax, trainingPercentages, "Squat");
-                if (benchMax > 0) calculateWeights(week, benchMax, trainingPercentages, "Bench Press");
-                if (ohpMax > 0) calculateWeights(week, ohpMax, trainingPercentages, "Overhead Press");
-                if (deadliftMax > 0) calculateWeights(week, deadliftMax, trainingPercentages, "Deadlift");
+                if (squatMax > 0) calculateWeights(week, squatMax, "Squat");
+                if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press");
+                if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press");
+                if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift");
             }
         } else {
-            float trainingPercentages[NUM_SETS];
-            if (squatMax > 0) calculateWeights(weekToDisplay, squatMax, trainingPercentages, "Squat");
-            if (benchMax > 0) calculateWeights(weekToDisplay, benchMax, trainingPercentages, "Bench Press");
-            if (ohpMax > 0) calculateWeights(weekToDisplay, ohpMax, trainingPercentages, "Overhead Press");
-            if (deadliftMax > 0) calculateWeights(weekToDisplay, deadliftMax, trainingPercentages, "Deadlift");
+            for (int week = 1; week <= NUM_WEEKS; week++) {
+                if (week == weekToDisplay) {
+                    if (squatMax > 0) calculateWeights(week, squatMax, "Squat");
+                    if (benchMax > 0) calculateWeights(week, benchMax, "Bench Press");
+                    if (ohpMax > 0) calculateWeights(week, ohpMax, "Overhead Press");
+                    if (deadliftMax > 0) calculateWeights(week, deadliftMax, "Deadlift");
+                }
+            }
         }
     }
 
